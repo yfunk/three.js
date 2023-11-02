@@ -35,9 +35,11 @@
 			import { CSM } from './jsm/csm/CSM.js';
 			import { CSMHelper } from './jsm/csm/CSMHelper.js';
 
-			let renderer, scene, camera, orthoCamera, controls, csm, csmHelper;
+			let renderer, scene, camera, orthoCamera, controls, csm, csmHelper, ambientLight;
 
 			const params = {
+				lights: true,
+				shadows: true,
 				orthographic: false,
 				fade: false,
 				far: 1000,
@@ -85,7 +87,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
-				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.enabled = params.shadows;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 				controls = new OrbitControls( camera, renderer.domElement );
@@ -94,7 +96,7 @@
 				controls.target = new THREE.Vector3( - 100, 10, 0 );
 				controls.update();
 
-				const ambientLight = new THREE.AmbientLight( 0xffffff, 0.5 );
+				ambientLight = new THREE.AmbientLight( 0xffffff, 1.5 );
 				scene.add( ambientLight );
 
 				csm = new CSM( {
@@ -147,6 +149,27 @@
 				}
 
 				const gui = new GUI();
+
+				gui.add( params, 'lights' ).onChange( function ( value ) {
+
+					ambientLight.visible = value;
+				} );
+
+				gui.add( params, 'shadows' ).onChange( function ( value ) {
+
+					renderer.shadowMap.enabled = value;
+
+					scene.traverse( function ( child ) {
+
+						if ( child.material ) {
+
+							child.material.needsUpdate = true;
+
+						}
+
+					} );
+
+				} );
 
 				gui.add( params, 'orthographic' ).onChange( function ( value ) {
 
