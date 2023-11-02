@@ -32,9 +32,10 @@
 			import { CSM } from 'three/addons/csm/CSM.js';
 			import { CSMHelper } from 'three/addons/csm/CSMHelper.js';
 
-			let renderer, scene, camera, orthoCamera, controls, csm, csmHelper;
+			let renderer, scene, camera, orthoCamera, controls, csm, csmHelper, ambientLight, additionalDirectionalLight;
 
 			const params = {
+				lights: true,
 				shadows: true,
 				orthographic: false,
 				fade: false,
@@ -92,10 +93,10 @@
 				controls.target = new THREE.Vector3( - 100, 10, 0 );
 				controls.update();
 
-				const ambientLight = new THREE.AmbientLight( 0xffffff, 1.5 );
+				ambientLight = new THREE.AmbientLight( 0xffffff, 1.5 );
 				scene.add( ambientLight );
 
-				const additionalDirectionalLight = new THREE.DirectionalLight( 0x000020, 1.5 );
+				additionalDirectionalLight = new THREE.DirectionalLight( 0x000020, 1.5 );
 				additionalDirectionalLight.position.set( params.lightX, params.lightY, params.lightZ ).normalize().multiplyScalar( - 200 );
 				scene.add( additionalDirectionalLight );
 
@@ -149,6 +150,13 @@
 				}
 
 				const gui = new GUI();
+
+				gui.add( params, 'lights' ).onChange( function ( value ) {
+
+					ambientLight.visible = value;
+					additionalDirectionalLight.visible = value;
+
+				} );
 
 				gui.add( params, 'shadows' ).onChange( function ( value ) {
 
